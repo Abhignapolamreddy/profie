@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import user.profile.register.client.UserProfileClient;
 import user.profile.register.entity.User;
 import user.profile.register.repository.UserRepository;
 import user.profile.register.request.AuthRequest;
 import user.profile.register.request.AuthResponse;
+import user.profile.register.request.UserDto;
 import user.profile.register.utils.JwtUtils;
 
 @Service
@@ -22,6 +24,9 @@ public class AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    
+    @Autowired
+    private UserProfileClient userProfileClient;
 
     public AuthResponse register(AuthRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -33,6 +38,13 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
+        
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+
+        userProfileClient.createProfileFromUser(dto);
 
         String token = jwtUtils.generateToken(user.getEmail());
         return new AuthResponse(token, "User registered successfully");

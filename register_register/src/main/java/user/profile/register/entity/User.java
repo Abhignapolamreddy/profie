@@ -10,7 +10,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	private String name;
 
     @Column(unique = true)
     private String email;
@@ -51,6 +59,8 @@ public class User {
 	}
 
 	private boolean subscribed = false; // For later use with payments
+
+
 
     // Getters and Setters
 }
